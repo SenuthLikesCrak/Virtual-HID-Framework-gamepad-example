@@ -1,0 +1,68 @@
+;
+; VHF-Device.inf
+;
+
+[Version]
+Signature = "$WINDOWS NT$"
+Class = HIDClass
+ClassGuid = {745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider = %ManufacturerName%
+CatalogFile = VHF-Device.cat
+DriverVer = 10/31/2024,25.80.35.230
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+VHF-Device.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64
+
+[Standard.NTamd64]
+%VHF-Device.DeviceDesc% = VHF-Device_Device.NT, Root\VHF-Device
+
+[VHF-Device_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+VHF-Device.sys
+
+;-------------- Service installation
+[VHF-Device_Device.NT.Services]
+AddService = VHF-Device,%SPSVCINST_ASSOCSERVICE%, VHF-Device_Service_Inst
+
+; -------------- VHF-Device driver install sections
+[VHF-Device_Service_Inst]
+DisplayName = %VHF-Device.SVCDESC%
+ServiceType = 1					; SERVICE_KERNEL_DRIVER
+StartType = 3					; SERVICE_DEMAND_START
+ErrorControl = 1				; SERVICE_ERROR_NORMAL
+ServiceBinary = %12%\VHF-Device.sys
+
+[VHF-Device_Device.NT.Wdf]
+KmdfService = VHF-Device, VHF-Device_wdfsect
+
+[VHF-Device_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[VHF-Device_Device.NT.HW]
+AddReg = LowerFilter_AddReg
+
+[LowerFilter_AddReg]
+HKR,,"LowerFilters",0x00010000,"vhf"
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "SenuthLikesCrak"
+DiskName = "VHF-Device Installation Disk"
+VHF-Device.DeviceDesc = "VHF Gamepad"
+VHF-Device.SVCDESC = "VHF-Device Service"
